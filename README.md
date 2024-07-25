@@ -1,30 +1,28 @@
-# GuardDog
-
-[![Test](https://github.com/DataDog/guarddog/actions/workflows/test.yml/badge.svg)](https://github.com/DataDog/guarddog/actions/workflows/test.yml) [![Static analysis](https://github.com/DataDog/guarddog/actions/workflows/semgrep.yml/badge.svg)](https://github.com/DataDog/guarddog/actions/workflows/semgrep.yml)
+# pyGuard
 
 <p align="center">
-  <img src="./docs/images/logo.png" alt="GuardDog" width="300" />
+  <img src="./docs/images/logo.png" alt="pyGuard" width="300" />
 </p>
 
-GuardDog is a CLI tool that allows to identify malicious PyPI and npm packages or Go modules. It runs a set of heuristics on the package source code (through Semgrep rules) and on the package metadata.
+pyGuard is a CLI tool that allows to identify malicious PyPI and npm packages or Go modules. It runs a set of heuristics on the package source code (through Semgrep rules) and on the package metadata.
 
-GuardDog can be used to scan local or remote PyPI and npm packages or Go modules using any of the available [heuristics](#heuristics).
+pyGuard can be used to scan local or remote PyPI and npm packages or Go modules using any of the available [heuristics](#heuristics).
 
-![GuardDog demo usage](docs/images/demo.png)
+![pyGuard demo usage](docs/images/demo.png)
 
 ## Getting started
 
 ### Installation
 
 ```sh
-pip install guarddog
+pip install pyGuard
 ```
 
 Or use the Docker image:
 
 ```sh
-docker pull ghcr.io/datadog/guarddog
-alias guarddog='docker run --rm ghcr.io/datadog/guarddog'
+docker pull ghcr.io/Griffin1989106/pyGuard
+alias pyGuard='docker run --rm ghcr.io/Griffin1989106/pyGuard'
 ```
 
 *Note: On Windows, the only supported installation method is Docker.*
@@ -33,51 +31,48 @@ alias guarddog='docker run --rm ghcr.io/datadog/guarddog'
 
 ```sh
 # Scan the most recent version of the 'requests' package
-guarddog pypi scan requests
+pyGuard pypi scan requests
 
 # Scan a specific version of the 'requests' package
-guarddog pypi scan requests --version 2.28.1
+pyGuard pypi scan requests --version 2.28.1
 
 # Scan the 'request' package using 2 specific heuristics
-guarddog pypi scan requests --rules exec-base64 --rules code-execution
+pyGuard pypi scan requests --rules exec-base64 --rules code-execution
 
 # Scan the 'requests' package using all rules but one
-guarddog pypi scan requests --exclude-rules exec-base64
+pyGuard pypi scan requests --exclude-rules exec-base64
 
 # Scan a local package
-guarddog pypi scan /tmp/triage.tar.gz
+pyGuard pypi scan /tmp/triage.tar.gz
 
 # Scan a local directory, the packages need to be located in the root directory
 # For instance you have several pypi packages in ./samples/ like:
 # ./samples/package1.tar.gz ./samples/package2.zip ./samples/package3.whl
-# FYI if a file not supported by guarddog is found you will get an error
+# FYI if a file not supported by pyGuard is found you will get an error
 # Here is the command to scan a directory:
-guarddog pypi scan ./samples/
+pyGuard pypi scan ./samples/
 
 # Scan every package referenced in a requirements.txt file of a local folder
-guarddog pypi verify workspace/guarddog/requirements.txt
+pyGuard pypi verify workspace/pyGuard/requirements.txt
 
 # Scan every package referenced in a requirements.txt file and output a sarif file - works only for verify
-guarddog pypi verify --output-format=sarif workspace/guarddog/requirements.txt
+pyGuard pypi verify --output-format=sarif workspace/pyGuard/requirements.txt
 
 # Output JSON to standard output - works for every command
-guarddog pypi scan requests --output-format=json
+pyGuard pypi scan requests --output-format=json
 
 # All the commands also work on npm or go
-guarddog npm scan express
+pyGuard npm scan express
 
 # Run in debug mode
-guarddog --log-level debug npm scan express
+pyGuard --log-level debug npm scan express
 ```
 
 
 ## Heuristics
 
-GuardDog comes with 2 types of heuristics:
+pyGuard comes with 2 types of heuristics:
 
-* [**Source code heuristics**](https://github.com/DataDog/guarddog/tree/main/guarddog/analyzer/sourcecode): Semgrep rules running against the package source code.
-
-* [**Package metadata heuristics**](https://github.com/DataDog/guarddog/tree/main/guarddog/analyzer/metadata): Python or Javascript heuristics running against the package metadata on PyPI or npm.
 
 <!-- BEGIN_RULE_LIST -->
 ### PyPI
@@ -157,13 +152,13 @@ Source code heuristics:
 
 ## Custom Rules
 
-Guarddog allows to implement custom sourcecode rules.
-Sourcecode rules live under the [guarddog/analyzer/sourcecode](guarddog/analyzer/sourcecode) directory, and supported formats are [Semgrep](https://github.com/semgrep/semgrep) or [Yara](https://github.com/VirusTotal/yara).
+pyGuard allows to implement custom sourcecode rules.
+Sourcecode rules live under the [pyGuard/analyzer/sourcecode](pyGuard/analyzer/sourcecode) directory, and supported formats are [Semgrep](https://github.com/semgrep/semgrep) or [Yara](https://github.com/VirusTotal/yara).
 
-* Semgrep rules are language-dependent, and Guarddog will import all `.yml` rules where the language matches the ecosystem selected by the user in CLI.
+* Semgrep rules are language-dependent, and pyGuard will import all `.yml` rules where the language matches the ecosystem selected by the user in CLI.
 * Yara rules on the other hand are language agnostic, therefore all matching `.yar` rules present will be imported.
 
-Is possible then to write your own rule and drop it into that directory, Guarddog will allow you to select it or exclude it as any built-in rule as well as appending the findings to its output.
+Is possible then to write your own rule and drop it into that directory, pyGuard will allow you to select it or exclude it as any built-in rule as well as appending the findings to its output.
 
 For example, you can create the following semgrep rule:
 ```yaml
@@ -198,19 +193,19 @@ Then you'll need to save it as `sample-rule.yar`.
 
 Note that in both cases, the rule id must match the filename
 
-## Running GuardDog in a GitHub Action
+## Running pyGuard in a GitHub Action
 
-The easiest way to integrate GuardDog in your CI pipeline is to leverage the SARIF output format, and upload it to GitHub's [code scanning](https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/about-code-scanning) feature.
+The easiest way to integrate pyGuard in your CI pipeline is to leverage the SARIF output format, and upload it to GitHub's [code scanning](https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/about-code-scanning) feature.
 
 Using this, you get:
-* Automated comments to your pull requests based on the GuardDog scan output
+* Automated comments to your pull requests based on the pyGuard scan output
 * Built-in false positive management directly in the GitHub UI
 
 
-Sample GitHub Action using GuardDog:
+Sample GitHub Action using pyGuard:
 
 ```yaml
-name: GuardDog
+name: pyGuard
 
 on:
   push:
@@ -224,7 +219,7 @@ permissions:
   contents: read
 
 jobs:
-  guarddog:
+  pyGuard:
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
@@ -239,22 +234,22 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install GuardDog
-        run: pip install guarddog
+      - name: Install pyGuard
+        run: pip install pyGuard
 
-      - run: guarddog pypi verify requirements.txt --output-format sarif --exclude-rules repository_integrity_mismatch > guarddog.sarif
+      - run: pyGuard pypi verify requirements.txt --output-format sarif --exclude-rules repository_integrity_mismatch > pyGuard.sarif
 
       - name: Upload SARIF file to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
-          category: guarddog-builtin
-          sarif_file: guarddog.sarif
+          category: pyGuard-builtin
+          sarif_file: pyGuard.sarif
 ```
 
 
 ## Development
 
-### Running a local version of GuardDog
+### Running a local version of pyGuard
 
 #### Using pip
 
@@ -262,36 +257,36 @@ jobs:
 * Clone the repository
 * Create a virtualenv: `python3 -m venv venv && source venv/bin/activate`
 * Install requirements: `pip install -r requirements.txt`
-* Run GuardDog using `python -m guarddog`
+* Run pyGuard using `python -m pyGuard`
 
 #### Using poetry
 
 * Ensure poetry has an env with `python >=3.10` `poetry env use 3.10.0`
 * Install dependencies `poetry install`
-* Run guarddog `poetry run guarddog` or `poetry shell` then run `guarddog`
+* Run pyGuard `poetry run pyGuard` or `poetry shell` then run `pyGuard`
 
 ### Unit tests
 
 Running all unit tests: `make test`
 
-Running unit tests against Semgrep rules: `make test-semgrep-rules` (tests are [here](https://github.com/DataDog/guarddog/tree/main/tests/analyzer/sourcecode)). These use the standard methodology for [testing Semgrep rules](https://semgrep.dev/docs/writing-rules/testing-rules/).
+Running unit tests against Semgrep rules: `make test-semgrep-rules` (tests are [here](https://github.com/Griffin1989106/pyGuard/tree/main/tests/analyzer/sourcecode)). These use the standard methodology for [testing Semgrep rules](https://semgrep.dev/docs/writing-rules/testing-rules/).
 
-Running unit tests against package metadata heuristics: `make test-metadata-rules` (tests are [here](https://github.com/DataDog/guarddog/tree/main/tests/analyzer/metadata)).
+Running unit tests against package metadata heuristics: `make test-metadata-rules` (tests are [here](https://github.com/Griffin1989106/pyGuard/tree/main/tests/analyzer/metadata)).
 
 ### Benchmarking
 
-You can run GuardDog on legitimate and malicious packages to determine false positives and false negatives. See [./tests/samples](./tests/samples)
+You can run pyGuard on legitimate and malicious packages to determine false positives and false negatives. See [./tests/samples](./tests/samples)
 
 ### Code quality checks
 
 Run the type checker with
 ```shell
-mypy --install-types --non-interactive guarddog
+mypy --install-types --non-interactive pyGuard
 ```
 and the linter with
 ```shell
-flake8 guarddog --count --select=E9,F63,F7,F82 --show-source --statistics --exclude tests/analyzer/sourcecode,tests/analyzer/metadata/resources,evaluator/data
-flake8 guarddog --count --max-line-length=120 --statistics --exclude tests/analyzer/sourcecode,tests/analyzer/metadata/resources,evaluator/data --ignore=E203,W503
+flake8 pyGuard --count --select=E9,F63,F7,F82 --show-source --statistics --exclude tests/analyzer/sourcecode,tests/analyzer/metadata/resources,evaluator/data
+flake8 pyGuard --count --max-line-length=120 --statistics --exclude tests/analyzer/sourcecode,tests/analyzer/metadata/resources,evaluator/data --ignore=E203,W503
 ```
 
 ## Maintainers
